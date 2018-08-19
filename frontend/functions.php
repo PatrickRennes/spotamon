@@ -1,4 +1,6 @@
 <?php
+# session has to come before anything else
+include './login/auth.php';
 ///////////////////// FORM SUBMISSION DATA \\\\\\\\\\\\\\\\\\\\\
 function pokesubmission(){
 require('./config/config.php');
