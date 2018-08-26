@@ -1,9 +1,10 @@
 <?php
 include_once('./auth.php');
-require('../config/config.php');
 
 // If form submitted, insert values into the database.
 if (isset($_POST['uname'])){
+		require_once('../config/db.php');
+		$conn = db();
 
 		$uname = stripslashes($_REQUEST['uname']); // removes backslashes
 		$uname = mysqli_real_escape_string($conn,$uname); //escapes special characters in a string

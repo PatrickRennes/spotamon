@@ -1,9 +1,10 @@
 <?php
 $curl = curl_init();
 ob_start();
-require './config/config.php';
+require_once('./config/db.php');
 include'frontend/functions.php';
 include("login/auth.php");
+$conn = db();
 $gname = $conn->real_escape_string($_POST['gname']);
 $egg = $conn->real_escape_string($_POST['egg']);
 $minutes = $conn->real_escape_string($_POST['etime']);
@@ -17,7 +18,7 @@ if ($clock=="false"){
 		$rhour = date('H', $timeuntilegg);
 		$rampm = '';
 		}
-		
+
 			$rmin = date('i', $timeuntilegg);
 
 $eggby = $conn->real_escape_string($_SESSION['uname']);
@@ -91,7 +92,7 @@ $row = $result->fetch_array(MYSQLI_NUM);
 $gymname = $row[0];
 $gymlat = $row[1];
 $gymlon = $row[2];
-$siteurl = "[".$viewtitle."](".$viewurl."/?loc=$gymlat,$gymlon&zoom=19)";		
+$siteurl = "[".$viewtitle."](".$viewurl."/?loc=$gymlat,$gymlon&zoom=19)";
 
 if ($clock=="false"){
 	$date = date('g:i:s A');
@@ -112,19 +113,19 @@ $hookObject = json_encode([
                 "text" => "Spotted at by $eggby at $date",
 				"icon_url" => "$viewurl/static/eggs/$egg.png"
             ],
-            
+
             "image" => [
 				"url" => "http://staticmap.openstreetmap.de/staticmap.php?center=".$gymlat.",".$gymlon."&zoom=17&size=400x400&maptype=mapnik&markers=".$gymlat.",".$gymlon.",red-pushpin",
             ],
-            
+
             "thumbnail" => [
 				"url" => "$viewurl/static/eggs/$egg.png",
             ],
-            
+
             "author" => [
                 "name" => "Level $egg egg spotted by $eggby",
             ],
-            
+
             "fields" => [
 				[
 					"name" => "Hatches at:",
@@ -139,7 +140,7 @@ $hookObject = json_encode([
             ]
         ]
     ]
-    
+
 ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
 
 $ch = curl_init();
@@ -155,8 +156,8 @@ curl_setopt_array( $ch, [
 ]);
 
 $response = curl_exec( $ch );
-curl_close( $ch );			
-			
+curl_close( $ch );
+
 	header('Location:index.php?loc='.$gymlat.','.$gymlon.'&zoom=19');
 }
 ?>

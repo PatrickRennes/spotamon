@@ -1,8 +1,8 @@
 <?php
-require('../config/config.php');
 
 function register_body(){
-    global $conn;
+    require_once('../config/db.php');
+    $conn = db();
 
     // If form submitted, insert values into the database.
     if (isset($_REQUEST['uname'])){

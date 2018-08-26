@@ -1,7 +1,8 @@
 <?php
-require './config/config.php';
+require_once('./config/db.php');
 include'frontend/functions.php';
 include'login/auth.php';
+$conn = db();
 $upass = $conn->real_escape_string($_POST['password']);
 // attempt insert query execution
 if(!empty($upass)){
@@ -11,7 +12,7 @@ if(mysqli_query($conn, $sql)){
 } else{
     echo "ERROR: Could not able to execute $sql. " . mysqli_error($conn);
 }
- 
+
 // close connection
 mysqli_close($conn);
 echo "<meta http-equiv=\"refresh\" content=\"0;URL=profile.php\">";

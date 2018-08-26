@@ -1,5 +1,6 @@
 <?php
-require('../config/config.php');
+require_once('../config/db.php');
+$conn = db();
 function parseToXML($htmlStr)
 {
 $xmlStr=str_replace('<','&lt;',$htmlStr);
@@ -38,8 +39,8 @@ while ($row = @mysqli_fetch_assoc($result)){
   echo 'egg="' . $row['egg'] . '" ';
   echo 'bossname="' . $row['monster'] . '" ';
   echo 'raidby="' . $row['raidby'] . '" ';
-  echo 'eggby="' . $row['eggby'] . '" ';  
-  echo 'teamby="' . $row['teamby'] . '" '; 
+  echo 'eggby="' . $row['eggby'] . '" ';
+  echo 'teamby="' . $row['teamby'] . '" ';
   echo 'bosscp="' . $row['rcp'] . '" ';
   echo 'exraid="' . $row['exraid'] . '" ';
   echo 'exraiddate="' . $row['exraiddate'] . '" ';

@@ -1,6 +1,8 @@
 <?php
 include 'frontend/menu.php';
-include_once 'config/config.php';?>
+require_once('./config/db.php');
+$conn = db()
+?>
 
 <head>
 	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
@@ -36,7 +38,7 @@ $(document).ready(function() {
 <table id="inbox" class="table table-bordered" style="background-color: rgba(255, 255, 255, 0.4);">
         <thead>
             <tr>
-                <th>To</th>				
+                <th>To</th>
                 <th>Subject</th>
                 <th>Date</th>
             </tr>
@@ -49,21 +51,21 @@ $(document).ready(function() {
 	$unread = $row['unread'];
 	$message = $row['message'];
 	$date = $row['date'];
-		
+
 	echo "
             <tr>
-                <td><a href=\"sent.php?id=$id\">".$to."</a></td>				
+                <td><a href=\"sent.php?id=$id\">".$to."</a></td>
                 <td><a href=\"sent.php?id=$id\">".$subject."</a></td>
                 <td><a href=\"sent.php?id=$id\">".$date."</a></td>
             </tr>
-	";	
-		
-		
+	";
+
+
 
 }?>
         </tbody>
     </table>
-	
+
 	</div>
 
 </center>

@@ -1,5 +1,6 @@
 <?php
-require '../config/config.php';
+require_once('../config/db.php');
+$conn = db();
 
 if (empty($delmon)) {
 	$delvalue = 5;
@@ -15,6 +16,6 @@ if(!mysqli_query($conn,$sql))
 else
 {
     echo 'Deleted';
-}    
+}
  // ends *_query() call
 ?>

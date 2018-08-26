@@ -1,11 +1,13 @@
 <?php
 ob_start();
-require './config/config.php';
+require_once('./config/db.php');
 include 'frontend/functions.php';
 include("login/auth.php");
 
+$conn = db();
+
 if (isset($_SESSION["uname"])) {
-    
+
     $result = $conn->query("SELECT * FROM users,usergroup WHERE uname='" . $_SESSION['uname'] . "' AND users.usergroup = usergroup.id LIMIT 1  ");
     $id     = $usergroup = "";
     while ($row = $result->fetch_assoc()) {
@@ -16,7 +18,7 @@ if (isset($_SESSION["uname"])) {
         if ("$usergroup" == 'admin') {
             $sql = "DROP TABLE `gyms`, `pokedex`, `quests`, `raidbosses`, `rewards`, `spotraid`, `spots`, `stops`, `teams`, `usergroup`, `users`";
             mysqli_query($conn, $sql);
-            
+
 ?>
 <html>
 <head>

@@ -1,15 +1,16 @@
 <?php function menu(){
-    include("login/auth.php");
-    require 'config/config.php';
-	
-	$gcountquery = $conn->query("SELECT * FROM `gyms`");
+include("login/auth.php");
+require_once('./config/db.php');
+$conn = db();
+$enable_messages = false;
+
+$gcountquery = $conn->query("SELECT * FROM `gyms`");
 $gcountresult = mysqli_num_rows($gcountquery);
 
 $scountquery = $conn->query("SELECT * FROM `stops`");
-$scountresult = mysqli_num_rows($scountquery);  
-	
-    ?>
-<?php if($analytics!==''){?>
+$scountresult = mysqli_num_rows($scountquery);
+
+if($analytics!==''){ ?>
 	<!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo $analytics;?>"></script>
 <script>
@@ -44,7 +45,7 @@ $scountresult = mysqli_num_rows($scountquery);
         $titles[] = "Spotamon, ask for the admin!";
         $titles[] = "Spotamon, we love you too <3";
         srand ((float) microtime() * 10000000); // Seed the random number generator
-    
+
 // Pick a random item from the array and output it
         echo $titles[array_rand($titles)];?>
         </title>
@@ -58,13 +59,13 @@ $scountresult = mysqli_num_rows($scountquery);
     <link rel="icon" href="static/img/favicon.ico" type="image/ico" sizes="16x16">
 
 	<script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
-	
+
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 
 	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
-	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.18/js/dataTables.bootstrap.min.js"></script>	
-	
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.18/js/dataTables.bootstrap.min.js"></script>
+
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
@@ -156,7 +157,7 @@ $scountresult = mysqli_num_rows($scountquery);
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="far fa-handshake"></span> Trading
                             <span class="caret"></span></a>
                         <ul class="dropdown-menu">
-                       
+
 							<li><a href="./offer-trade.php">Create Trade</a></li>
 							<li><a href="./active-trades.php">Open Trades</a></li>
                         </ul>
@@ -176,20 +177,20 @@ $scountresult = mysqli_num_rows($scountquery);
 
                         ?>
                         <?php
-                    	if(isset($_SESSION["uname"])){
+                    	if(isset($_SESSION["uname"]) && $enable_messages){
                     	$countquery = $conn->query("SELECT * FROM `messages` WHERE unread=1 AND to_user = '".$_SESSION["uname"]."' AND del_in='0'");
                         $msgcount = mysqli_num_rows($countquery);
-                    	}
-                    	?>						
+                    	?>
                                             <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-envelope"></span> Messages <span class="badge"><?php echo $msgcount;?></span>
-                            <span class="caret"></span></a>
+                          <span class="caret"></span></a>
                         <ul class="dropdown-menu">
-                            <li><a href="./inbox.php">Inbox</a></li>
-							<li><a href="./outbox.php">Outbox</a></li>
-                            <li><a href="./compose.php">Send message</a></li>
+                          <li><a href="./inbox.php">Inbox</a></li>
+                          <li><a href="./outbox.php">Outbox</a></li>
+                          <li><a href="./compose.php">Send message</a></li>
                         </ul>
                     </li>
+                  <?php } ?>
 						<li><a href="profile.php"><?php if ($url !=='') {?><img src="./userpics/<?php echo $url; ?>" height="25px" width="25px" alt="logo"  style="border:1px solid black"><?php } else {?><img src="./userpics/nopic.png" height="25px" width="25px" alt="logo"  style="border:1px solid black"><?php }?> Welcome <?php echo $_SESSION['uname']; ?></a></li>
                         <li><a href="login/logout.php"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
                     <?php } else {?>

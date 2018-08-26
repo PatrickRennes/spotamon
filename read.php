@@ -1,6 +1,8 @@
 <?php
 include 'frontend/menu.php';
-include_once 'config/config.php';?>
+require_once('./config/db.php');
+$conn = db();
+?>
 
 <head>
 	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
@@ -24,15 +26,15 @@ $error='';
 }
 
 else if(isset($_SESSION["uname"], $_GET['del'], $_SERVER['HTTP_REFERER'])){
-	
+
 	    $delquery = "UPDATE messages SET del_in='1' WHERE id='".$_GET['del']."' AND to_user='".$_SESSION["uname"]."' AND del_in='0'";
 
     if(!mysqli_query($conn,$delquery))
     	{
     		echo '<center><p><label class="text-danger">MESSAGE NOT AVAILABLE</label></p></center>';
-    	} 
-		else 
-		{ 
+    	}
+		else
+		{
 	echo '<center><p><label class="text-success">MESSAGE DELETED</label></p></center>';
 	echo "<meta http-equiv=\"refresh\" content=\"1;url='./inbox.php'\"/>";
 	}
@@ -40,9 +42,9 @@ else if(isset($_SESSION["uname"], $_GET['del'], $_SERVER['HTTP_REFERER'])){
 
 else if(isset($_SESSION["uname"], $_GET['id'])){
 
-	
 
-	
+
+
 	    $query = "SELECT * from messages WHERE to_user='".$_SESSION["uname"]."' AND id='".$_GET['id']."'";
     if(!mysqli_query($conn,$query))
     	{
@@ -50,9 +52,9 @@ else if(isset($_SESSION["uname"], $_GET['id'])){
     	}
     		else
     		{}
-    
+
     $result = $conn->query($query);
-    
+
     $row = $result->fetch_array(MYSQLI_NUM);
     $msgid = $row[0];
 	$subject = $row[1];
@@ -61,23 +63,23 @@ else if(isset($_SESSION["uname"], $_GET['id'])){
 	$unread = $row[4];
 	$message = $row[5];
 	$date = $row[6];
-	
+
 		// Begin of reply
-	if (isset($_POST['submit'])){ 
-	
-	
-	
+	if (isset($_POST['submit'])){
+
+
+
 	$reply = "INSERT INTO messages (subject, to_user, message, from_user, unread) VALUES ('RE: ".$subject."', '".$from."', '".$_POST['message']."', '".$_SESSION["uname"]."', '1')";
-			
+
 			if ($_POST['message'] == ''){ $error .=  'Message cannot be empty';}
-			
+
 			else if(mysqli_query($conn,$reply))
 			{
 				$error .= '<p><label class="text-succes">Reply sent to '.$from.'</label></p>';
 				}
 }
 // End of reply
-	
+
 if ($row){
 	?>
 <center>
@@ -145,6 +147,6 @@ if ($row){
 </body>
 <?php // else for 'if row'
  } else { echo "<center><p><label class=\"text-danger\">Invalid ID or not allowed to view</label></p></center>";}?>
- 
+
 <?php // else for 'if(isset($_SESSION["uname"], $_GET['id'])){'
 } else  { echo "<center><p><label class=\"text-danger\">You are not allowed to view this page</label></p></center>";} ?>

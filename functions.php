@@ -1,7 +1,8 @@
 <?php
 ///////////////////// FORM SUBMISSION DATA \\\\\\\\\\\\\\\\\\\\\
 function pokesubmission(){
-require('./config/config.php');
+require('config/db.php');
+$conn = db();
 $result = $conn->query("SELECT * FROM pokedex");
 $id = $pokemon = $cp = $iv = $hour = $min = $ampm = $monster = $latitude = $longitude = $fulladdress = $spotter ="";
 if(isset($_SESSION["uname"])){ ?>
@@ -23,9 +24,8 @@ while ($row = $result->fetch_assoc()) {
         $id = $row['id'];
             $monster= $row['monster'];
 				echo '<option value="'.$id.'">'.$id.' - '.$monster.'</option>';
-					}					
+					}
 						echo "</select>";
-							mysqli_close($conn);
 ?>
 </td>
 </tr>
@@ -58,7 +58,7 @@ var x = document.getElementById("ScanLocation");
 function getLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition);
-    } else { 
+    } else {
         x.innerHTML = "Geolocation is not supported by this browser.";
     }
 }
@@ -93,26 +93,27 @@ function showPosition(position) {
 </form>
 
 <?php } else {
-	
+
 	echo "<center><div style='margin-top:10px;'>";
 	echo "Login to spot a pokemon";
 		?><br /><br /><a href="./login/login.php">Login Here</a><?php
 	echo "</div></center>";
 	}
-} 
+}
 
 ///////////////////// SPOTTED MONSTER TABLE \\\\\\\\\\\\\\\\\\\\\
 function spottedpokemon(){
-require('./config/config.php');
+require('./config/db.php');
+$conn = db();
 $results_per_page = 10;
 
-if (isset($_GET["page"])) { $page  = $_GET["page"]; } else { $page=1; }; 
+if (isset($_GET["page"])) { $page  = $_GET["page"]; } else { $page=1; };
 $start_from = ($page-1) * $results_per_page;
 $sql = "SELECT * FROM spots,pokedex WHERE spots.pokemon = pokedex.id ORDER BY spotid DESC LIMIT $start_from,".$results_per_page;
 $result = mysqli_query($conn,$sql)or die(mysqli_error($conn));
 
 
-$sqlcnt = "SELECT COUNT(SPOTID) AS total FROM spots"; 
+$sqlcnt = "SELECT COUNT(SPOTID) AS total FROM spots";
 $resultcnt = $conn->query($sqlcnt);
 $row = $resultcnt->fetch_assoc();
 $total_pages = ceil($row["total"] / $results_per_page);
@@ -138,7 +139,7 @@ while($row = mysqli_fetch_array($result)) {
 	$id = $row['monster'];
     $pokemon = $row['pokemon'];
     $cp = $row['cp'];
-    $iv = $row['iv'];	
+    $iv = $row['iv'];
 	$hour = $row['hour'];
 	$min = $row['min'];
 	$ampm = $row['ampm'];
@@ -151,17 +152,17 @@ while($row = mysqli_fetch_array($result)) {
 	$good = $row['good'];
 	$bad = $row['bad'];
 	}
-	
+
 	///////////////////// ADDS "0" TO SIGNLE DIGIT MINUTE TIMES \\\\\\\\\\\\\\\\\\\\\
 	if ($min < 10) {
-    $minutes = str_pad($min, 2, "0", STR_PAD_LEFT);	
+    $minutes = str_pad($min, 2, "0", STR_PAD_LEFT);
 	}
-	
+
 	///////////////////// 12 HOUR FORMAT \\\\\\\\\\\\\\\\\\\\\
 	if ($clock=="false"){
-		
+
 	///////////////////// 12 HOUR TABLE LAYOUT \\\\\\\\\\\\\\\\\\\\\
-	
+
 	if(isset($_SESSION["uname"])){
 	echo "
 	<tr>
@@ -188,19 +189,19 @@ while($row = mysqli_fetch_array($result)) {
 	<td>"?><a href="./?loc=<?php echo "".$latitude,",".$longitude.""?>&zoom=19"><?php echo $fulladdress;?></a><?php echo "</td>
 	";
 	}
-		
-		
+
+
 	} else {
 	///////////////////// 24 HOUR FORMAT \\\\\\\\\\\\\\\\\\\\\
 
 	///////////////////// ADDS "0" TO SIGNLE DIGIT HOUR TIMES \\\\\\\\\\\\\\\\\\\\\
 	if ($hour < 10) {
-    $hr = str_pad($hour, 2, "0", STR_PAD_LEFT);	
+    $hr = str_pad($hour, 2, "0", STR_PAD_LEFT);
 	}
-	
+
 	///////////////////// 24 HOUR TABLE LAYOUT \\\\\\\\\\\\\\\\\\\\\
-	
-	if(isset($_SESSION["uname"])){	
+
+	if(isset($_SESSION["uname"])){
 	echo "
 	<tr>
 	<td style='text-align:center;'>".$spotid."</td>
@@ -232,14 +233,15 @@ echo "</table></center><p id='pages'>";
 ?><center><?php
 
 ///////////////////// PAGENATION \\\\\\\\\\\\\\\\\\\\\
-for ($i=1; $i<=$total_pages; $i++) { 
-    echo "<a href='".basename($_SERVER['PHP_SELF'])."?page=".$i."'>".$i."</a> "; 
-}; 
+for ($i=1; $i<=$total_pages; $i++) {
+    echo "<a href='".basename($_SERVER['PHP_SELF'])."?page=".$i."'>".$i."</a> ";
+};
 ?></center><?php
 }
 
 function maps(){
-	require('./config/config.php');
+    require('./config/db.php');
+    $conn = db();
 ?>
 
 <div id="map"></div>
@@ -300,13 +302,13 @@ echo 15;
             url: './static/icons/' + id + '.png',
             scaledSize: new google.maps.Size(32, 32)
         };
-		
-		var html = '<div class=\"maplabel\"><center><img src=\"./static/icons/' + id + '.png\" height=\"45\" width=\"45\"></img><p><b>' 
+
+		var html = '<div class=\"maplabel\"><center><img src=\"./static/icons/' + id + '.png\" height=\"45\" width=\"45\"></img><p><b>'
 		+ pokemon + ' (#' + id + ')</b><br>CP: ' + cp + '<br>IV: '+ iv + '%<br>Found: ' + hour + ':' + min + ' ' + ampm +
 		'<?php if(isset($_SESSION["uname"])){?><br><hr><a href =\"./good.php?spotid=' + spotid + '&loc=' + markerElem.getAttribute('latitude') + ',' + markerElem.getAttribute('longitude') + '\"><img src=\"./static/voting/up.png\" height=\"25\" width=\"25\"></img></a>' + good +
-		' x Found<br><a href =\"./bad.php?spotid=' + spotid + '&loc=' + markerElem.getAttribute('latitude') + ',' + markerElem.getAttribute('longitude') + '\"><img src=\"./static/voting/down.png\" height=\"25\" width=\"25\"></img></a>' + bad + ' x Not found<?php }?><br><hr><a href=\"http://maps.google.com/maps?q=' + 
+		' x Found<br><a href =\"./bad.php?spotid=' + spotid + '&loc=' + markerElem.getAttribute('latitude') + ',' + markerElem.getAttribute('longitude') + '\"><img src=\"./static/voting/down.png\" height=\"25\" width=\"25\"></img></a>' + bad + ' x Not found<?php }?><br><hr><a href=\"http://maps.google.com/maps?q=' +
 		markerElem.getAttribute('latitude') + ',' + markerElem.getAttribute('longitude') + '\">Google Maps</a><?php if(isset($_SESSION["uname"])){?><br><hr>Spotted by: <b>' + spotter + '</b><?php }?></center></div>';
-		
+
         var marker = new google.maps.Marker({
           map: map,
           position: point,
@@ -319,7 +321,7 @@ echo 15;
         });
       });
     });
-	
+
 	downloadUrl('./frontend/gxml.php', function(data) {
       var xml = data.responseXML;
       var markers = xml.documentElement.getElementsByTagName('marker');
@@ -344,7 +346,7 @@ echo 15;
 		var point = new google.maps.LatLng(
             parseFloat(markerElem.getAttribute('glatitude')),
             parseFloat(markerElem.getAttribute('glongitude')));
-			
+
 
 		if (actraid === "0" && egg === "0"){
 			if (exraid === "1"){
@@ -380,22 +382,22 @@ echo 15;
 			}
 		} else if (actraid === "0" && egg !== "0"){
 			if (exraid === "0"){
-			var html = '<div class=\"maplabel\"><center><img src=\"./static/eggs/' + egg + '.png\" height=\"45px\" width=\"45px\"></img><p><b>' + gname + '</b><br>Egg level: ' + egg + '<br>Team: ' + tid + '<br>Hatches at: ' + hour + ':' + min + ' ' + ampm + '<?php if(!isset($_SESSION["uname"])){?><hr><b><span class="text-danger">Login to change/add teams or raids.</span></b><?php }?><?php if(isset($_SESSION["uname"])){?><br><hr><b>Choose team:</b><br><form action=\"./gymteam.php\" name=\"postInstinct\" method=\"post\"\"><input type=\"hidden\" name=\"gname\" value=\"' + gid + '\"><input type=\"hidden\" name=\"tname\" value=\"2\"></form><form action=\"./gymteam.php\" name=\"postValor\" method=\"post\"\"><input type=\"hidden\" name=\"gname\" value=\"' + gid + '\"><input type=\"hidden\" name=\"tname\" value=\"3\"></form><form action=\"./gymteam.php\" name=\"postMystic\" method=\"post\"\"><input type=\"hidden\" name=\"gname\" value=\"' + gid + '\"><input type=\"hidden\" name=\"tname\" value=\"4\"></form><a href=\"javascript:submitInstinct();\"><img border="0" alt="W3Schools" src="./static/teams/2.png" width="25" height="25"></a> / <a href="javascript:submitValor();\"><img border="0" alt="W3Schools" src="./static/teams/3.png" width="25" height="25"></a> / <a href="javascript:submitMystic();\"><img border="0" alt="W3Schools" src="./static/teams/4.png" width="25" height="25"></a><?php };?><br><hr><a href=\"http://maps.google.com/maps?q=' + markerElem.getAttribute('glatitude') + ',' + markerElem.getAttribute('glongitude') + '\">Google Maps</a><?php if(isset($_SESSION["uname"])){?><br><hr><b>Spotted by: </b>' + eggby + '<?php }?></center></div>';		
+			var html = '<div class=\"maplabel\"><center><img src=\"./static/eggs/' + egg + '.png\" height=\"45px\" width=\"45px\"></img><p><b>' + gname + '</b><br>Egg level: ' + egg + '<br>Team: ' + tid + '<br>Hatches at: ' + hour + ':' + min + ' ' + ampm + '<?php if(!isset($_SESSION["uname"])){?><hr><b><span class="text-danger">Login to change/add teams or raids.</span></b><?php }?><?php if(isset($_SESSION["uname"])){?><br><hr><b>Choose team:</b><br><form action=\"./gymteam.php\" name=\"postInstinct\" method=\"post\"\"><input type=\"hidden\" name=\"gname\" value=\"' + gid + '\"><input type=\"hidden\" name=\"tname\" value=\"2\"></form><form action=\"./gymteam.php\" name=\"postValor\" method=\"post\"\"><input type=\"hidden\" name=\"gname\" value=\"' + gid + '\"><input type=\"hidden\" name=\"tname\" value=\"3\"></form><form action=\"./gymteam.php\" name=\"postMystic\" method=\"post\"\"><input type=\"hidden\" name=\"gname\" value=\"' + gid + '\"><input type=\"hidden\" name=\"tname\" value=\"4\"></form><a href=\"javascript:submitInstinct();\"><img border="0" alt="W3Schools" src="./static/teams/2.png" width="25" height="25"></a> / <a href="javascript:submitValor();\"><img border="0" alt="W3Schools" src="./static/teams/3.png" width="25" height="25"></a> / <a href="javascript:submitMystic();\"><img border="0" alt="W3Schools" src="./static/teams/4.png" width="25" height="25"></a><?php };?><br><hr><a href=\"http://maps.google.com/maps?q=' + markerElem.getAttribute('glatitude') + ',' + markerElem.getAttribute('glongitude') + '\">Google Maps</a><?php if(isset($_SESSION["uname"])){?><br><hr><b>Spotted by: </b>' + eggby + '<?php }?></center></div>';
 			var icon = customLabel[type] || {};
 			var image = {
             url: './static/eggs/' + egg + '.png',
             scaledSize: new google.maps.Size(55, 55)
 			};
 			} else if (exraid === "1"){
-			var html = '<div class=\"maplabel\"><center><img src=\"./static/eggs/' + egg + '.png\" height=\"45px\" width=\"45px\"></img><p><b>' + gname + '</b><br>Egg level: ' + egg + '<br>Team: ' + tid + '<br>Hatches at: ' + hour + ':' + min + ' ' + ampm + '<?php if(!isset($_SESSION["uname"])){?><hr><b><span class="text-danger">Login to change/add teams or raids.</span></b><?php }?><?php if(isset($_SESSION["uname"])){?><br><hr><strong>EX Raid On:</strong><br> ' + exraiddate + '<br><hr><b>Choose team:</b><br><form action=\"./gymteam.php\" name=\"postInstinct\" method=\"post\"\"><input type=\"hidden\" name=\"gname\" value=\"' + gid + '\"><input type=\"hidden\" name=\"tname\" value=\"2\"></form><form action=\"./gymteam.php\" name=\"postValor\" method=\"post\"\"><input type=\"hidden\" name=\"gname\" value=\"' + gid + '\"><input type=\"hidden\" name=\"tname\" value=\"3\"></form><form action=\"./gymteam.php\" name=\"postMystic\" method=\"post\"\"><input type=\"hidden\" name=\"gname\" value=\"' + gid + '\"><input type=\"hidden\" name=\"tname\" value=\"4\"></form><a href=\"javascript:submitInstinct();\"><img border="0" alt="W3Schools" src="./static/teams/2.png" width="25" height="25"></a> / <a href="javascript:submitValor();\"><img border="0" alt="W3Schools" src="./static/teams/3.png" width="25" height="25"></a> / <a href="javascript:submitMystic();\"><img border="0" alt="W3Schools" src="./static/teams/4.png" width="25" height="25"></a><?php };?><br><hr><a href=\"http://maps.google.com/maps?q=' + markerElem.getAttribute('glatitude') + ',' + markerElem.getAttribute('glongitude') + '\">Google Maps</a><?php if(isset($_SESSION["uname"])){?><br><hr><b>Spotted by: </b>' + eggby + '<?php }?></center></div>';		
+			var html = '<div class=\"maplabel\"><center><img src=\"./static/eggs/' + egg + '.png\" height=\"45px\" width=\"45px\"></img><p><b>' + gname + '</b><br>Egg level: ' + egg + '<br>Team: ' + tid + '<br>Hatches at: ' + hour + ':' + min + ' ' + ampm + '<?php if(!isset($_SESSION["uname"])){?><hr><b><span class="text-danger">Login to change/add teams or raids.</span></b><?php }?><?php if(isset($_SESSION["uname"])){?><br><hr><strong>EX Raid On:</strong><br> ' + exraiddate + '<br><hr><b>Choose team:</b><br><form action=\"./gymteam.php\" name=\"postInstinct\" method=\"post\"\"><input type=\"hidden\" name=\"gname\" value=\"' + gid + '\"><input type=\"hidden\" name=\"tname\" value=\"2\"></form><form action=\"./gymteam.php\" name=\"postValor\" method=\"post\"\"><input type=\"hidden\" name=\"gname\" value=\"' + gid + '\"><input type=\"hidden\" name=\"tname\" value=\"3\"></form><form action=\"./gymteam.php\" name=\"postMystic\" method=\"post\"\"><input type=\"hidden\" name=\"gname\" value=\"' + gid + '\"><input type=\"hidden\" name=\"tname\" value=\"4\"></form><a href=\"javascript:submitInstinct();\"><img border="0" alt="W3Schools" src="./static/teams/2.png" width="25" height="25"></a> / <a href="javascript:submitValor();\"><img border="0" alt="W3Schools" src="./static/teams/3.png" width="25" height="25"></a> / <a href="javascript:submitMystic();\"><img border="0" alt="W3Schools" src="./static/teams/4.png" width="25" height="25"></a><?php };?><br><hr><a href=\"http://maps.google.com/maps?q=' + markerElem.getAttribute('glatitude') + ',' + markerElem.getAttribute('glongitude') + '\">Google Maps</a><?php if(isset($_SESSION["uname"])){?><br><hr><b>Spotted by: </b>' + eggby + '<?php }?></center></div>';
 			var icon = customLabel[type] || {};
 			var image = {
             url: './static/eggs/' + egg + '.png',
-            scaledSize: new google.maps.Size(55, 55)			
+            scaledSize: new google.maps.Size(55, 55)
 			};
 			}
-		} 
-		
+		}
+
         var marker = new google.maps.Marker({
           map: map,
           position: point,
@@ -409,7 +411,7 @@ echo 15;
         });
       });
     });
-	
+
 	downloadUrl('./frontend/sxml.php', function(data) {
       var xml = data.responseXML;
       var markers = xml.documentElement.getElementsByTagName('marker');
@@ -424,9 +426,9 @@ echo 15;
 		var point = new google.maps.LatLng(
             parseFloat(markerElem.getAttribute('slatitude')),
             parseFloat(markerElem.getAttribute('slongitude')));
-		
+
 		if (quested === "1"){
-		
+
 		var html = '<div class=\"maplabel\"><center><img src=\"./static/stops/queststop.png\" height=\"45\" width=\"45\"></img><p><b>' + sname + '</b><?php if(!isset($_SESSION["uname"])){?><br>(<b><span class="text-success">Quested</span></b>)<br><hr><b><span class="text-danger">Login to add/view quests.</span></b><?php }?><?php if(isset($_SESSION["uname"])){?></b><br><hr><b>Quest:</b><br> ' + quest + '<br><hr><b>Reward:</b><br>' + reward + '<?php };?><br><hr><a href=\"http://maps.google.com/maps?q=' + markerElem.getAttribute('slatitude') + ',' + markerElem.getAttribute('slongitude') + '\">Google Maps</a><?php if(isset($_SESSION["uname"])){?><br><hr><b>Spotted by: </b>' + questby + '<?php }?></center></div>';
         var icon = customLabel[type] || {};
         var image = {
@@ -439,9 +441,9 @@ echo 15;
         var image = {
             url: './static/stops/stops.png',
             scaledSize: new google.maps.Size(30, 30)
-			};				
-		} 
-		
+			};
+		}
+
         var marker = new google.maps.Marker({
           map: map,
           position: point,
@@ -454,7 +456,7 @@ echo 15;
         });
       });
     });
-	
+
   }
 
 function downloadUrl(url, callback) {
@@ -483,10 +485,11 @@ function doNothing() {}
 ///////////////// SUBMIT RAIDS \\\\\\\\\\\\\\\\\
 
 function raidsubmission(){
-require('./config/config.php');
-$result = $conn->query("SELECT * FROM raidbosses");
-$rid = $rboss = $rlvl = $rhour = $rmin = $rampm = $spotter="";
-if(isset($_SESSION["uname"])){ 
+    require('./config/db.php');
+    $conn = db();
+    $result = $conn->query("SELECT * FROM raidbosses");
+    $rid = $rboss = $rlvl = $rhour = $rmin = $rampm = $spotter="";
+    if(isset($_SESSION["uname"])){
 ?>
 
 <!--///////////////////// SUBMIT FORM \\\\\\\\\\\\\\\\\\\\\-->
@@ -501,15 +504,14 @@ if(isset($_SESSION["uname"])){
 <td style="width: 5%;">Raid Boss</td>
 <td style="width: 10%;">
 <?php
-echo "<select id='raidsearch' name='rboss'>";
-while ($row = $result->fetch_assoc()) {
-    unset($rid, $rboss);
-        $rid = $row['rid'];
+        echo "<select id='raidsearch' name='rboss'>";
+        while ($row = $result->fetch_assoc()) {
+            unset($rid, $rboss);
+            $rid = $row['rid'];
             $rboss= $row['rboss'];
-				echo '<option value="'.$rid.'">'.$rid.' - '.$rboss.'</option>';
-					}					
-						echo "</select>";
-							mysqli_close($conn);
+            echo '<option value="'.$rid.'">'.$rid.' - '.$rboss.'</option>';
+        }
+        echo "</select>";
 ?>
 </td>
 </tr>
@@ -541,7 +543,9 @@ sliderraid.oninput = function() {
 <td style="width: 5%;">At Gym</td>
 <td style="width: 10%;">
 <?php
-require('./config/config.php');
+require('./config/db.php');
+$conn = db();
+
 $result = $conn->query("SELECT * FROM gyms,teams WHERE gyms.gteam = teams.tid");
 $gid = $gname = $gteam = "";
 echo "<select id='gymsearch' name='gname'>";
@@ -552,9 +556,9 @@ while ($row = $result->fetch_assoc()) {
             $gname= $row['gname'];
 				$gteam= $row['gteam'];
 					echo '<option value="'.$gid.'" label="'.$gteam.'">'.$gname.'</option>';
-						}					
+						}
 							echo "</select>";
-						
+
 ?>
 
 </td>
@@ -567,22 +571,23 @@ while ($row = $result->fetch_assoc()) {
 </form>
 
 <?php } else{
-	
+
 	echo "<center><div style='margin-top:10px;'>";
 	echo "Login to spot a Raid";
 		?><br /><br /><a href="./login/login.php">Login Here</a><?php
 	echo "</div></center>";
-	
+
 } }
 ////////////////////// SPOTTED RAIDS \\\\\\\\\\\\\\\\\\\\\\\\\
 function spottedraids(){
-require('./config/config.php');
+require('./config/db.php');
+$conn = db();
 $results_per_page = 10;
-if (isset($_GET["page"])) { $page  = $_GET["page"]; } else { $page=1; }; 
+if (isset($_GET["page"])) { $page  = $_GET["page"]; } else { $page=1; };
 $start_from = ($page-1) * $results_per_page;
 $sql = "SELECT * FROM raidbosses,gyms WHERE gyms.actraid = '1' AND gyms.actboss = raidbosses.rid  AND gyms.glatitude AND gyms.glongitude ORDER BY date DESC LIMIT $start_from,".$results_per_page;
 $result = mysqli_query($conn,$sql)or die(mysqli_error($conn));
-$sqlcnt = "SELECT COUNT(RID) AS total FROM spotraid"; 
+$sqlcnt = "SELECT COUNT(RID) AS total FROM spotraid";
 $resultcnt = $conn->query($sqlcnt);
 $row = $resultcnt->fetch_assoc();
 $total_pages = ceil($row["total"] / $results_per_page);
@@ -610,16 +615,16 @@ while($row = mysqli_fetch_array($result)) {
 	$minutes = $min;
 	$hr = $hour;
 	$gname = $row['gname'];
-	
-	
+
+
 	///////////////////// ADDS "0" TO SIGNLE DIGIT MINUTE TIMES \\\\\\\\\\\\\\\\\\\\\
 	if ($min < 10) {
-    $minutes = str_pad($min, 2, "0", STR_PAD_LEFT);	
+    $minutes = str_pad($min, 2, "0", STR_PAD_LEFT);
 	}
-	
+
 	///////////////////// 12 HOUR FORMAT \\\\\\\\\\\\\\\\\\\\\
 	if ($clock=="false"){
-		
+
 	///////////////////// 12 HOUR TABLE LAYOUT \\\\\\\\\\\\\\\\\\\\\
 	echo "
 	<tr>
@@ -629,14 +634,14 @@ while($row = mysqli_fetch_array($result)) {
 	<td>".$hour.":".$minutes." ".$ampm."</td>
 	<td>"?><a href="./?loc=<?php echo "".$glatitude,",".$glongitude.""?>&zoom=19"><?php echo $gname;?></a><?php echo "</td>
 	</tr>";
-		
+
 	} else {
 	///////////////////// 24 HOUR FORMAT \\\\\\\\\\\\\\\\\\\\\
 	///////////////////// ADDS "0" TO SIGNLE DIGIT HOUR TIMES \\\\\\\\\\\\\\\\\\\\\
 	if ($hour < 10) {
-    $hr = str_pad($hour, 2, "0", STR_PAD_LEFT);	
+    $hr = str_pad($hour, 2, "0", STR_PAD_LEFT);
 	}
-	
+
 	///////////////////// 24 HOUR TABLE LAYOUT \\\\\\\\\\\\\\\\\\\\\
 	echo "
 	<tr>
@@ -646,24 +651,25 @@ while($row = mysqli_fetch_array($result)) {
 	<td>".$hr.":".$minutes."</td>
 	<td>"?><a href="./?loc=<?php echo "".$glatitude,",".$glongitude.""?>&zoom=19"><?php echo $gname;?></a><?php echo "</td>
 	</tr>";
-	
+
 }}
 echo "</table></center><p id='pages'>";
 ?><center><?php
 ///////////////////// PAGENATION \\\\\\\\\\\\\\\\\\\\\
-for ($i=1; $i<=$total_pages; $i++) { 
-    echo "<a href='".basename($_SERVER['PHP_SELF'])."?page=".$i."'>".$i."</a> "; 
-}; 
+for ($i=1; $i<=$total_pages; $i++) {
+    echo "<a href='".basename($_SERVER['PHP_SELF'])."?page=".$i."'>".$i."</a> ";
+};
 ?></center><?php
 }
 
 ///////////////// SUBMIT QUESTS \\\\\\\\\\\\\\\\\
 
 function questsubmission(){
-require('./config/config.php');
+require('./config/db.php');
+$conn = db();
 $result = $conn->query("SELECT * FROM quests");
 $qid = $qname= $spotter="";
-if(isset($_SESSION["uname"])){ 
+if(isset($_SESSION["uname"])){
 ?>
 
 <!--///////////////////// SUBMIT FORM \\\\\\\\\\\\\\\\\\\\\-->
@@ -684,7 +690,7 @@ while ($row = $result->fetch_assoc()) {
         $qid = $row['qid'];
             $qname= $row['qname'];
 $array[$row['type']][] = $row;
-					}					
+					}
 // loop the array to create optgroup
 foreach($array as $key=>$value){
     // check if its an array
@@ -708,7 +714,8 @@ foreach($array as $key=>$value){
 <td style="width: 5%;">Rewards</td>
 <td style="width: 10%;">
 <?php
-require('./config/config.php');
+require('./config/db.php');
+$conn = db();
 $result2 = $conn->query("SELECT * FROM rewards");
 $reid = $rname= "";
 echo "<select id='rewardsearch' name='reward'>";
@@ -717,7 +724,7 @@ while ($row2 = $result2->fetch_assoc()) {
         $reid = $row2['reid'];
             $rname= $row2['rname'];
 $array2[$row2['type']][] = $row2;
-					}					
+					}
 // loop the array to create optgroup
 foreach($array2 as $key=>$value){
     // check if its an array
@@ -748,9 +755,9 @@ while ($row = $result->fetch_assoc()) {
         $sid = $row['sid'];
             $sname= $row['sname'];
 				echo '<option value="'.$sid.'">'.$sname.'</option>';
-					}					
+					}
 						echo "</select>";
-						
+
 ?>
 
 </td>
@@ -763,28 +770,29 @@ while ($row = $result->fetch_assoc()) {
 </form>
 
 <?php } else{
-	
+
 	echo "<center><div style='margin-top:10px;'>";
 	echo "Login to spot a Quest";
 		?><br /><br /><a href="./login/login.php">Login Here</a><?php
 	echo "</div></center>";
-	
+
 } }
 
 ////////////////////// SPOTTED QUESTS \\\\\\\\\\\\\\\\\\\\\\\\\
 
 
 function spottedquests(){
-require('./config/config.php');
+require('./config/db.php');
+$conn = db();
 $results_per_page = 10;
 
-if (isset($_GET["page"])) { $page  = $_GET["page"]; } else { $page=1; }; 
+if (isset($_GET["page"])) { $page  = $_GET["page"]; } else { $page=1; };
 $start_from = ($page-1) * $results_per_page;
 $sql = "SELECT * from stops,quests,rewards WHERE quested='1' AND stops.actquest = quests.qid AND stops.actreward = rewards.reid ORDER BY date DESC LIMIT $start_from,".$results_per_page;
 $result = mysqli_query($conn,$sql)or die(mysqli_error($conn));
 
 
-$sqlcnt = "SELECT COUNT(SID) AS total FROM stops WHERE quested='1'"; 
+$sqlcnt = "SELECT COUNT(SID) AS total FROM stops WHERE quested='1'";
 $resultcnt = $conn->query($sqlcnt);
 $row = $resultcnt->fetch_assoc();
 $total_pages = ceil($row["total"] / $results_per_page);
@@ -803,7 +811,7 @@ echo "<tr><th>ID</th><th>QUEST</th><th>REWARD</th><th>SPOTTED</th><th>LOCATION</
 while($row = mysqli_fetch_array($result)) {
 	$questname = $row['qname'];
     $sname = $row['sname'];
-    $reward = $row['rname'];	
+    $reward = $row['rname'];
 	$sid = $row['sid'];
 	$slat = $row['slatitude'];
 	$slon = $row['slongitude'];
@@ -812,15 +820,15 @@ while($row = mysqli_fetch_array($result)) {
 	$ampm = $row['ampm'];
 	$minutes = $min;
 	$hr = $hour;
-	
+
 	///////////////////// ADDS "0" TO SIGNLE DIGIT MINUTE TIMES \\\\\\\\\\\\\\\\\\\\\
 	if ($min < 10) {
-    $minutes = str_pad($min, 2, "0", STR_PAD_LEFT);	
+    $minutes = str_pad($min, 2, "0", STR_PAD_LEFT);
 	}
-	
+
 	///////////////////// 12 HOUR FORMAT \\\\\\\\\\\\\\\\\\\\\
 	if ($clock=="false"){
-		
+
 	///////////////////// 12 HOUR TABLE LAYOUT \\\\\\\\\\\\\\\\\\\\\
 	echo "
 	<tr>
@@ -830,15 +838,15 @@ while($row = mysqli_fetch_array($result)) {
 	<td>".$hour.":".$minutes." ".$ampm."</td>
 	<td>"?><a href="./?loc=<?php echo "".$slat,",".$slon.""?>&zoom=19"><?php echo $sname;?></a><?php echo "</td>
 	</tr>";
-		
+
 	} else {
 	///////////////////// 24 HOUR FORMAT \\\\\\\\\\\\\\\\\\\\\
 
 	///////////////////// ADDS "0" TO SIGNLE DIGIT HOUR TIMES \\\\\\\\\\\\\\\\\\\\\
 	if ($hour < 10) {
-    $hr = str_pad($hour, 2, "0", STR_PAD_LEFT);	
+    $hr = str_pad($hour, 2, "0", STR_PAD_LEFT);
 	}
-	
+
 	///////////////////// 24 HOUR TABLE LAYOUT \\\\\\\\\\\\\\\\\\\\\
 	echo "
 	<tr>
@@ -846,17 +854,17 @@ while($row = mysqli_fetch_array($result)) {
 	<td>".$questname."</td>
 	<td>".$reward."</td>
 	<td>".$hr.":".$minutes."</td>
-	<td>"?><a href="./?loc=<?php echo "".$slat,",".$slon.""?>&zoom=19"><?php echo $sname;?></a><?php echo "</td>	
+	<td>"?><a href="./?loc=<?php echo "".$slat,",".$slon.""?>&zoom=19"><?php echo $sname;?></a><?php echo "</td>
 	</tr>";
-	
+
 }}
 echo "</table></center><p id='pages'>";
 ?><center><?php
 
 ///////////////////// PAGENATION \\\\\\\\\\\\\\\\\\\\\
-for ($i=1; $i<=$total_pages; $i++) { 
-    echo "<a href='".basename($_SERVER['PHP_SELF'])."?page=".$i."'>".$i."</a> "; 
-}; 
+for ($i=1; $i<=$total_pages; $i++) {
+    echo "<a href='".basename($_SERVER['PHP_SELF'])."?page=".$i."'>".$i."</a> ";
+};
 ?></center><?php
 }
 
@@ -864,16 +872,17 @@ for ($i=1; $i<=$total_pages; $i++) {
 
 
 function spottedeggs(){
-require('./config/config.php');
+require('./config/db.php');
+$conn = db();
 $results_per_page = 10;
 
-if (isset($_GET["page"])) { $page  = $_GET["page"]; } else { $page=1; }; 
+if (isset($_GET["page"])) { $page  = $_GET["page"]; } else { $page=1; };
 $start_from = ($page-1) * $results_per_page;
 $sql = "SELECT * FROM gyms WHERE gyms.egg != '0' ORDER BY date DESC LIMIT $start_from,".$results_per_page;
 $result = mysqli_query($conn,$sql)or die(mysqli_error($conn));
 
 
-$sqlcnt = "SELECT COUNT(eggby) AS total FROM gyms WHERE egg !='0'"; 
+$sqlcnt = "SELECT COUNT(eggby) AS total FROM gyms WHERE egg !='0'";
 $resultcnt = $conn->query($sqlcnt);
 $row = $resultcnt->fetch_assoc();
 $total_pages = ceil($row["total"] / $results_per_page);
@@ -900,16 +909,16 @@ while($row = mysqli_fetch_array($result)) {
 	$hr = $hour;
 	$gname = $row['gname'];
 	$egg = $row['egg'];
-	
-	
+
+
 	///////////////////// ADDS "0" TO SIGNLE DIGIT MINUTE TIMES \\\\\\\\\\\\\\\\\\\\\
 	if ($min < 10) {
-    $minutes = str_pad($min, 2, "0", STR_PAD_LEFT);	
+    $minutes = str_pad($min, 2, "0", STR_PAD_LEFT);
 	}
-	
+
 	///////////////////// 12 HOUR FORMAT \\\\\\\\\\\\\\\\\\\\\
 	if ($clock=="false"){
-		
+
 	///////////////////// 12 HOUR TABLE LAYOUT \\\\\\\\\\\\\\\\\\\\\
 	echo "
 	<tr>
@@ -918,15 +927,15 @@ while($row = mysqli_fetch_array($result)) {
 	<td>".$hour.":".$minutes." ".$ampm."</td>
 	<td>"?><a href="./?loc=<?php echo "".$glatitude,",".$glongitude.""?>&zoom=19"><?php echo $gname;?></a><?php echo "</td>
 	</tr>";
-		
+
 	} else {
 	///////////////////// 24 HOUR FORMAT \\\\\\\\\\\\\\\\\\\\\
 
 	///////////////////// ADDS "0" TO SIGNLE DIGIT HOUR TIMES \\\\\\\\\\\\\\\\\\\\\
 	if ($hour < 10) {
-    $hr = str_pad($hour, 2, "0", STR_PAD_LEFT);	
+    $hr = str_pad($hour, 2, "0", STR_PAD_LEFT);
 	}
-	
+
 	///////////////////// 24 HOUR TABLE LAYOUT \\\\\\\\\\\\\\\\\\\\\
 	echo "
 	<tr>
@@ -935,24 +944,25 @@ while($row = mysqli_fetch_array($result)) {
 	<td>".$hr.":".$minutes."</td>
 	<td>"?><a href="./?loc=<?php echo "".$glatitude,",".$glongitude.""?>&zoom=19"><?php echo $gname;?></a><?php echo "</td>
 	</tr>";
-	
+
 }}
 echo "</table></center><p id='pages'>";
 ?><center><?php
 
 ///////////////////// PAGENATION \\\\\\\\\\\\\\\\\\\\\
-for ($i=1; $i<=$total_pages; $i++) { 
-    echo "<a href='".basename($_SERVER['PHP_SELF'])."?page=".$i."'>".$i."</a> "; 
-}; 
+for ($i=1; $i<=$total_pages; $i++) {
+    echo "<a href='".basename($_SERVER['PHP_SELF'])."?page=".$i."'>".$i."</a> ";
+};
 ?></center><?php
 }
 
 ///////////////////// FORM SUBMISSION DATA \\\\\\\\\\\\\\\\\\\\\
 function gymsubmission(){
-require('./config/config.php');
+require('./config/db.php');
+$conn = db();
 $result = $conn->query("SELECT * FROM gyms,teams WHERE gyms.gteam = teams.tid");
 $gid = $gname = $gteam = $teamby="";
-if(isset($_SESSION["uname"])){ 
+if(isset($_SESSION["uname"])){
 ?>
 
 <!--///////////////////// SUBMIT FORM \\\\\\\\\\\\\\\\\\\\\-->
@@ -974,9 +984,9 @@ while ($row = $result->fetch_assoc()) {
             $gname= $row['gname'];
 				$gteam= $row['gteam'];
 					echo '<option value="'.$gid.'" label="'.$gteam.'">'.$gname.'</option>';
-						}					
+						}
 							echo "</select>";
-						
+
 ?>
 </td>
 </tr>
@@ -1000,7 +1010,7 @@ while ($row = $result->fetch_assoc()) {
 </form>
 
 <?php } else{
-	
+
 	echo "<center><div style='margin-top:10px;'>";
 	echo "Login to spot a team";
 		?><br /><br /><a href="./login/login.php">Login Here</a><?php
@@ -1009,7 +1019,8 @@ while ($row = $result->fetch_assoc()) {
 
 
 function eggsubmission(){
-require('./config/config.php');
+require('./config/db.php');
+$conn = db();
 $result = $conn->query("SELECT * FROM gyms,teams WHERE gyms.gteam = teams.tid");
 $gid = $gname = $gteam = $eggby="";
 if(isset($_SESSION["uname"])){
@@ -1034,9 +1045,9 @@ while ($row = $result->fetch_assoc()) {
             $gname= $row['gname'];
 				$gteam= $row['gteam'];
 					echo '<option value="'.$gid.'" label="'.$gteam.'">'.$gname.'</option>';
-						}					
+						}
 							echo "</select>";
-						
+
 ?>
 </td>
 </tr>
@@ -1089,34 +1100,35 @@ slideregg.oninput = function() {
 	echo "Login to spot an Egg";
 		?><br /><br /><a href="./login/login.php">Login Here</a><?php
 	echo "</div></center>";
-	
+
 } }
 
-function profile(){ 
+function profile(){
 if(isset($_SESSION["uname"])){
-require('config/config.php');
+require('./config/db.php');
+$conn = db();
 $result = $conn->query("SELECT * FROM users,usergroup WHERE uname='".$_SESSION['uname']."' AND users.usergroup = usergroup.id LIMIT 1  ");
 
 $gcountquery = $conn->query("SELECT * FROM `gyms`");
 $gcountresult = mysqli_num_rows($gcountquery);
 
 $scountquery = $conn->query("SELECT * FROM `stops`");
-$scountresult = mysqli_num_rows($scountquery);  
+$scountresult = mysqli_num_rows($scountquery);
 
 $eggcountquery = $conn->query("SELECT * FROM `gyms` WHERE egg != 0");
-$eggcountresult = mysqli_num_rows($eggcountquery);  
+$eggcountresult = mysqli_num_rows($eggcountquery);
 
 $raidcountquery = $conn->query("SELECT * FROM `gyms` WHERE actraid != 0");
-$raidcountresult = mysqli_num_rows($raidcountquery); 
+$raidcountresult = mysqli_num_rows($raidcountquery);
 
 $teamcountquery = $conn->query("SELECT * FROM `gyms` WHERE gteam > 1");
-$teamcountresult = mysqli_num_rows($teamcountquery); 
+$teamcountresult = mysqli_num_rows($teamcountquery);
 
 $moncountquery = $conn->query("SELECT * FROM `spots`");
-$moncountresult = mysqli_num_rows($moncountquery); 
+$moncountresult = mysqli_num_rows($moncountquery);
 
 $questcountquery = $conn->query("SELECT * FROM `stops` WHERE quested != 0");
-$questcountresult = mysqli_num_rows($questcountquery); 
+$questcountresult = mysqli_num_rows($questcountquery);
 
 $totalspots = $eggcountresult + $raidcountresult + $teamcountresult + $moncountresult + $questcountresult;
 
@@ -1145,19 +1157,19 @@ $id = $usergroup = "";?>
 	echo "<br /><center><a href='./edit-profile.php'>Edit Profile</a></center>";
 	if ("$usergroup" == 'admin'){
 		?>
-		
+
 		<h2 style="text-align:center;"><strong>Admin Panel:</strong></h2>
 		<center>
 		<a href="gymcsv.php">Upload Gym .CSV</a><br />
 		<a href="stopcsv.php">Upload Stop .CSV</a><br />
-		
+
 		<h2 style="text-align:center;"><strong>Database overview</strong></h2>
-		
+
 		<center><table id="t02" class="spotted">
         <tbody>
         <tr>
         <th colspan="2"><strong><center>Database</strong></th>
-        </tr>	
+        </tr>
         <tr>
         <td>Gyms</td>
         <td><?php echo $gcountresult?></td>
@@ -1169,14 +1181,14 @@ $id = $usergroup = "";?>
         <tr>
         <td>Database version</td>
         <td><?php echo $version?></td>
-        </tr>		
+        </tr>
         <tr>
         <th colspan="2"><strong><center>Spots</strong></th>
-        </tr>		
+        </tr>
         <tr>
         <td>Pokemon</td>
         <td><?php echo $moncountresult?></td>
-        </tr>			
+        </tr>
         <tr>
         <td>Raids</td>
         <td><?php echo $raidcountresult?></td>
@@ -1188,15 +1200,15 @@ $id = $usergroup = "";?>
         <tr>
         <td>Teams</td>
         <td><?php echo $teamcountresult?></td>
-        </tr>		
+        </tr>
         <tr>
         <td>Quests</td>
         <td><?php echo $questcountresult?></td>
-        </tr>			
+        </tr>
         <tr>
         <td><strong>Total spots:</strong></td>
         <td><strong><?php echo $totalspots?></strong></td>
-        </tr>			
+        </tr>
 		<tr>
 		<td colspan="2"><a href="./droptables.php" onclick="return confirm('Are you sure?');"><center>Drop database</center></a></td>
 		<tr>
@@ -1204,7 +1216,7 @@ $id = $usergroup = "";?>
         </table></center>
 		<?php
 	}
-	
+
 	}
 } else{
 	echo "<center><div style='margin-top:10px;'>";
@@ -1214,28 +1226,29 @@ $id = $usergroup = "";?>
 } }
 
 
-function editprofile(){ 
+function editprofile(){
 if(isset($_SESSION["uname"])){
-require('config/config.php');
-$result = $conn->query("SELECT * FROM users,usergroup WHERE uname='".$_SESSION['uname']."' AND users.usergroup = usergroup.id LIMIT 1  "); 
+require('./config/db.php');
+$conn = db();
+$result = $conn->query("SELECT * FROM users,usergroup WHERE uname='".$_SESSION['uname']."' AND users.usergroup = usergroup.id LIMIT 1  ");
 $id = $usergroup = "";?>
 <h2 style="text-align:center;"><strong>Edit Your Profile:</strong></h2>
 <?php
 	echo "<center><table style='width:20%;' id=\"t05\" class=\"profile\">";
-	
+
 	while ($row = $result->fetch_assoc()) {
 	$id = $row['id'];
     $uname = $row['uname'];
     $email = $row['email'];
 	$usergroup = $row['groupname'];
 	$url = $row['url'];?>
-	
+
 	<tr>
 	<form action="editusername.php" method="post">
 	<?php echo "<th style='background-color:#fff;color:#000;width:10%;'><center>Username: </center></th>";?>
-	<?php echo "<td><center><input type='text' name='uname' id='uname'><input type='submit' value='Submit'></center></td></form>";?>	
+	<?php echo "<td><center><input type='text' name='uname' id='uname'><input type='submit' value='Submit'></center></td></form>";?>
 	</tr>
-	
+
 	<tr>
 	<form action="editemail.php" method="post">
 	<?php echo "<th style='background-color:#f9f9f9;color:#000;'><center>Email: </center></th>";?>
@@ -1293,7 +1306,7 @@ $id = $usergroup = "";?>
 	<h2 style="text-align:center;"><strong>Upload profile picture:</strong></h2>
 	<?php
 	}
-	
+
 if($conn->connect_errno){
 echo $conn->connect_error;
 }
@@ -1376,8 +1389,9 @@ echo '<div class="imgLow">';
 ///////////////// SUBMIT EX RAIDS \\\\\\\\\\\\\\\\\
 
 function exraidsubmission(){
-require('./config/config.php');
-if(isset($_SESSION["uname"])){ 
+require('./config/db.php');
+$conn = db();
+if(isset($_SESSION["uname"])){
 ?>
 
 <!--///////////////////// SUBMIT FORM \\\\\\\\\\\\\\\\\\\\\-->
@@ -1390,7 +1404,6 @@ if(isset($_SESSION["uname"])){
 <td style="width: 5%;">At Gym</td>
 <td style="width: 10%;">
 <?php
-require('./config/config.php');
 $result = $conn->query("SELECT * FROM gyms,teams WHERE gyms.gteam = teams.tid");
 $gid = $gname = $gteam = "";
 echo "<select id='gymsearch' name='gname'>";
@@ -1401,8 +1414,8 @@ while ($row = $result->fetch_assoc()) {
             $gname= $row['gname'];
 				$gteam= $row['gteam'];
 					echo '<option value="'.$gid.'" label="'.$gteam.'">'.$gname.'</option>';
-						}					
-							echo "</select>";				
+						}
+							echo "</select>";
 ?>
 
 </td>
@@ -1426,19 +1439,20 @@ while ($row = $result->fetch_assoc()) {
 </form>
 
 <?php } else{
-	
+
 	echo "<center><div style='margin-top:5%;'>";
 	echo "Login to spot a Raid";
 		?><br /><br /><a href="./login/login.php">Login Here</a><?php
 	echo "</div></center>";
-	
+
 } }
 
 ////////////////////// SPOTTED RAIDS \\\\\\\\\\\\\\\\\\\\\\\\\
 function spottedexraids(){
-require('./config/config.php');
+require('./config/db.php');
+$conn = db();
 $results_per_page = 10;
-if (isset($_GET["page"])) { $page  = $_GET["page"]; } else { $page=1; }; 
+if (isset($_GET["page"])) { $page  = $_GET["page"]; } else { $page=1; };
 $start_from = ($page-1) * $results_per_page;
 $sql = "SELECT * FROM exraids, gyms WHERE exraids.gname = gyms.gid ORDER BY exraids.exraiddate ASC LIMIT $start_from,".$results_per_page;
 $result = mysqli_query($conn,$sql)or die(mysqli_error($conn));
@@ -1464,10 +1478,10 @@ while($row = mysqli_fetch_array($result)) {
 	$spotter = $row['spotter'];
 	$glatitude = $row['glatitude'];
 	$glongitude = $row['glongitude'];
-	
+
 	///////////////////// 12 HOUR FORMAT \\\\\\\\\\\\\\\\\\\\\
 	if ($clock=="false"){
-		
+
 	///////////////////// 12 HOUR TABLE LAYOUT \\\\\\\\\\\\\\\\\\\\\
 	echo "
 	<tr>
@@ -1477,30 +1491,30 @@ while($row = mysqli_fetch_array($result)) {
 	<td>"?><center><?php echo $spotter;?><center><?php echo "</td>
 	<td>"?><center><form action='attendance.php' method='post'><input type='hidden' name='exidr' value="<?php echo $exid; ?>" /><input type='image' name='att' style='width:25px;height:auto;align:middle;' src='static/voting/up.png' value="<?php echo $_SESSION['uname']?>" /></form><a href='./ex-attendance.php' style='display:inline;'>View</a></center><?php echo "</td>
 	</tr>";
-		
+
 	} else {
 	///////////////////// 24 HOUR FORMAT \\\\\\\\\\\\\\\\\\\\\
-	
+
 	///////////////////// 24 HOUR TABLE LAYOUT \\\\\\\\\\\\\\\\\\\\\
 	echo "
 	<tr>
 	<td>"?><a href="./?loc=<?php echo "".$glatitude,",".$glongitude.""?>&zoom=19"><?php echo $gname;?></a><?php echo "</td>
 	<td>".$exraiddate."</td>
 	</tr>";
-	
+
 }}
 echo "</table></center><p id='pages'>";
 ?><center><?php
 ///////////////////// PAGENATION \\\\\\\\\\\\\\\\\\\\\
-for ($i=1; $i<=$total_pages; $i++) { 
-    echo "<a href='".basename($_SERVER['PHP_SELF'])."?page=".$i."'>".$i."</a> "; 
-}; 
+for ($i=1; $i<=$total_pages; $i++) {
+    echo "<a href='".basename($_SERVER['PHP_SELF'])."?page=".$i."'>".$i."</a> ";
+};
 ?></center><?php
 }
 
 function exatt(){
-require('./config/config.php');
-
+require('./config/db.php');
+$conn = db();
 
 ?>
 
@@ -1514,7 +1528,7 @@ require('./config/config.php');
 echo "<table id=\"t02\" class=\"spotted\">";
 echo "<tr><th>ID</th><th>Gym</th><th>Date and Time</th><th>Attending</th></tr>";
 $results_per_page = 15;
-if (isset($_GET["page"])) { $page  = $_GET["page"]; } else { $page=1; }; 
+if (isset($_GET["page"])) { $page  = $_GET["page"]; } else { $page=1; };
 $start_from = ($page-1) * $results_per_page;
 $sql1 = "SELECT * FROM exraidatt,exraids,gyms WHERE exraidatt.exid = exraids.exid AND exraids.gname = gyms.gid ORDER BY exraids.exid ASC LIMIT $start_from,".$results_per_page;
 $result = mysqli_query($conn,$sql1)or die(mysqli_error($conn));
@@ -1523,7 +1537,7 @@ $resultcnt = $conn->query($sqlcnt);
 $row = $resultcnt->fetch_assoc();
 $total_pages = ceil($row["total"] / $results_per_page);
 while($row = mysqli_fetch_array($result)) {
-	
+
 	$exid = $row['exid'];
 	$uid = $row['uid'];
 	$gname = $row['gname'];
@@ -1533,7 +1547,7 @@ while($row = mysqli_fetch_array($result)) {
 	///////////////////// 12 HOUR FORMAT \\\\\\\\\\\\\\\\\\\\\
 
 	if ($clock=="false"){
-		
+
 	///////////////////// 12 HOUR TABLE LAYOUT \\\\\\\\\\\\\\\\\\\\\
 	echo "
 	<tr>
@@ -1542,10 +1556,10 @@ while($row = mysqli_fetch_array($result)) {
 	<td>".$exraiddate."</td>
 	<td>".$uid."</td>
 	</tr>";
-		
+
 	} else {
 	///////////////////// 24 HOUR FORMAT \\\\\\\\\\\\\\\\\\\\\
-	
+
 	///////////////////// 24 HOUR TABLE LAYOUT \\\\\\\\\\\\\\\\\\\\\
 	echo "
 	<tr>
@@ -1554,16 +1568,15 @@ while($row = mysqli_fetch_array($result)) {
 	<td>".$exraiddate."</td>
 	<td>".$uid."</td>
 	</tr>";
-	
+
 }}
 echo "</table></center><p id='pages'>";
 ?><center><?php
 ///////////////////// PAGENATION \\\\\\\\\\\\\\\\\\\\\
-for ($i=1; $i<=$total_pages; $i++) { 
-    echo "<a href='".basename($_SERVER['PHP_SELF'])."?page=".$i."'>".$i."</a> "; 
-}; 
+for ($i=1; $i<=$total_pages; $i++) {
+    echo "<a href='".basename($_SERVER['PHP_SELF'])."?page=".$i."'>".$i."</a> ";
+};
 ?></center><?php
 }
 
 ?>
-

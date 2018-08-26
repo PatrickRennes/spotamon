@@ -1,8 +1,9 @@
 <?php
 
-require '../config/config.php';
+require_once('./config/db.php');
 include '../frontend/functions.php';
 include("../login/auth.php");
+$conn = db();
 
 if (isset($_POST['oid'])) {
 $oid = $conn->real_escape_string($_POST['oid']);
@@ -17,19 +18,19 @@ if(isset($_POST['cshiny'])){
 	$cshiny = $conn->real_escape_string($_POST['cshiny']);
 	$cshiny = 1;
 } else {
-	$cshiny = 0;	
+	$cshiny = 0;
 }
 
 if(isset($_POST['calolan'])){
 	$calolan = $conn->real_escape_string($_POST['alolan']);
 	$calolan = 1;
 } else {
-	$calolan = 0;	
+	$calolan = 0;
 }
 
 $sql = "SELECT * FROM offers WHERE oid='$oid'";
 $result = mysqli_query($conn,$sql)or die(mysqli_error($conn));
-while($row = mysqli_fetch_array($result)) {			
+while($row = mysqli_fetch_array($result)) {
 	$oid = $row['oid'];
 	$offmon = $row['offmon'];
 	$tradeloc = $row['tradeloc'];

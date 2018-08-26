@@ -1,6 +1,10 @@
 <?php
-include 'frontend/menu.php';
-include_once 'config/config.php';?>
+include_once('login/auth.php');
+require_once('config/db.php');
+require_once('frontend/menu.php');
+
+$conn = db();
+?>
 
 <head>
 	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
@@ -94,26 +98,26 @@ $(document).ready(function() {
             </tr>
 	";
 	} else {
-		
+
 	echo "
             <tr>
                 <td><a href=\"read.php?id=$id\">".$from."</a></td>
                 <td><a href=\"read.php?id=$id\">".$subject."</a></td>
                 <td><a href=\"read.php?id=$id\">".$date."</a></td>
             </tr>
-	";}	
-		
-		
+	";}
+
+
 
 }?>
         </tbody>
     </table>
-	
+
 	<form action="<?php echo $_SERVER['PHP_SELF']?>" method="post">
 <input type="submit" name="markreadall" value="Mark all as read"> / <input type="submit" name="deleteall" value="Delete all">
 <p><?php echo $error;?></p>
 </form>
-	
+
 	</div>
 
 </center>

@@ -1,7 +1,6 @@
 <?php
 include 'frontend/functions.php';
 include 'frontend/menu.php';
-include 'config/dbbuilding.php';
 
 ?>
 
@@ -20,4 +19,3 @@ mytrades();
 </body>
 
 <footer></footer>
-

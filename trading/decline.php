@@ -1,6 +1,7 @@
 <?php
-require '../config/config.php';
+require_once('./config/db.php');
 include '../frontend/functions.php';
+$conn = db();
 
 if (isset($_GET['oid'])) {
 	$toid = $_GET['toid'];
@@ -10,7 +11,7 @@ if (isset($_GET['oid'])) {
 
 $selectresult = $conn->query($selectquery);
 $row = $selectresult->fetch_array(MYSQLI_NUM);
-	
+
 } else {
 $toid = $conn->real_escape_string($_POST['toid']);
 $oid = $conn->real_escape_string($_POST['oid']);
@@ -27,5 +28,5 @@ $sql1 = "UPDATE tradeoffers SET accepted='$accepted' WHERE toid='$toid'";
             {
 				echo "<meta http-equiv=\"refresh\" content=\"0;URL=../active-offers.php?oid=".$oid."\">";
 			}
-			
+
 ?>

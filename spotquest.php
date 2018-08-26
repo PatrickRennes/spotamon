@@ -1,16 +1,17 @@
 <?php
 $curl = curl_init();
 ob_start();
-require './config/config.php';
+require_once('./config/db.php');
 include'frontend/functions.php';
 include("login/auth.php");
+$conn = db();
 
 $quest = $conn->real_escape_string($_POST['quest']);
 $reward = $conn->real_escape_string($_POST['reward']);
-$sname = $conn->real_escape_string($_POST['sname']);             
-$sid = $conn->real_escape_string($_POST['sid']); 
-$reid = $conn->real_escape_string($_POST['reid']); 
-$qid = $conn->real_escape_string($_POST['qid']); 
+$sname = $conn->real_escape_string($_POST['sname']);
+$sid = $conn->real_escape_string($_POST['sid']);
+$reid = $conn->real_escape_string($_POST['reid']);
+$qid = $conn->real_escape_string($_POST['qid']);
 $spotter = $conn->real_escape_string($_SESSION['uname']);
 
 if ($clock=="false"){
@@ -20,7 +21,7 @@ if ($clock=="false"){
 		$qhour = date('H');
 		$qampm = '';
 		}
-		
+
 $qmin = date('i');
 
 $sql1 = "UPDATE stops SET quested='1',actquest='$quest',actreward='$reward',hour='$qhour', min='$qmin',ampm='$qampm',questby='$spotter' WHERE sid='$sname'";
@@ -100,19 +101,19 @@ $hookObject = json_encode([
                 "text" => "Spotted by $spotter at $date",
 				"icon_url" => "$viewurl/static/stops/queststop.png"
             ],
-            
+
             "image" => [
 				"url" => "http://staticmap.openstreetmap.de/staticmap.php?center=".$slat.",".$slon."&zoom=17&size=400x400&maptype=mapnik&markers=".$slat.",".$slon.",red-pushpin",
             ],
-            
+
             "thumbnail" => [
 				"url" => "$viewurl/static/stops/queststop.png",
             ],
-            
+
             "author" => [
                 "name" => "Quest spotted by $spotter",
             ],
-            
+
             "fields" => [
                 [
                     "name" => "Pokestop",
@@ -122,7 +123,7 @@ $hookObject = json_encode([
             ]
         ]
     ]
-    
+
 ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
 
 $ch = curl_init();
@@ -139,6 +140,6 @@ curl_setopt_array( $ch, [
 
 $response = curl_exec( $ch );
 curl_close( $ch );
-			
-    header('Location:index.php?loc='.$slat.','.$slon.'&zoom=19');    
+
+    header('Location:index.php?loc='.$slat.','.$slon.'&zoom=19');
 ?>

@@ -1,7 +1,6 @@
 <?php
 include 'frontend/functions.php';
 include 'frontend/menu.php';
-include 'config/dbbuilding.php';
 ?>
 
 <head>
@@ -19,4 +18,3 @@ profile();
 </body>
 
 <footer></footer>
-

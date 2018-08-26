@@ -1,17 +1,20 @@
 <?php
-require 'config/config.php';
+require 'config/db.php';
 include 'frontend/functions.php';
 include("login/auth.php");
+
+$conn = db();
+
 if (isset($_GET['oid'])) {
-	
+
 $oid = $_GET['oid'];
 $selectquery = "SELECT accepted FROM offers WHERE oid='$oid'";
 $selectresult = $conn->query($selectquery);
 $row = $selectresult->fetch_array(MYSQLI_NUM);
 $accepted = $row[0];
-	
+
 } else {
-	
+
 $oid = $conn->real_escape_string($_POST['oid']);
 $accepted = $conn->real_escape_string($_POST['accepted']);
 }
@@ -34,7 +37,7 @@ $sql1 = "UPDATE offers SET accepted='$accepted' WHERE oid='$oid'";
 
 $sql2 = "SELECT * FROM offers WHERE oid='$oid'";
 $result = mysqli_query($conn,$sql2)or die(mysqli_error($conn));
-while($row = mysqli_fetch_array($result)) {			
+while($row = mysqli_fetch_array($result)) {
 	$oid = $row['oid'];
 	$offmon = $row['offmon'];
 	$tradeloc = $row['tradeloc'];
@@ -52,7 +55,7 @@ $sql3 = "INSERT INTO trades (oid, tradeloc, tname, rname, offmon) VALUES ('$oid'
 if(!mysqli_query($conn,$sql3))
 {
     echo 'Not Inserted1';
-}		
+}
 
 $sql6 = "INSERT INTO tradeoffers (oid, coffer, offerby, cofferby, ccp, civ, cshiny, calolan, accepted, complete) VALUES ('$oid','$coffer','$offerby','$rname','$ccp','$civ','$shiny','$alolan','$accepted','$complete')";
 if(!mysqli_query($conn,$sql6)){
@@ -60,10 +63,10 @@ if(!mysqli_query($conn,$sql6)){
 }
 
 $sql4 = "SELECT * FROM users WHERE uname='".$_SESSION['uname']."'";
-$result = mysqli_query($conn,$sql4)or die(mysqli_error($conn));	
+$result = mysqli_query($conn,$sql4)or die(mysqli_error($conn));
 				while($row = mysqli_fetch_array($result)) {
-					$reqtrades = $row['reqtrades'];					
-				}	
+					$reqtrades = $row['reqtrades'];
+				}
 			$reqtrades = ++$reqtrades;
 
 $sql5 = "UPDATE users SET reqtrades='$reqtrades' WHERE uname='".$_SESSION['uname']."'";

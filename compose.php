@@ -1,6 +1,9 @@
 <?php
 include 'frontend/menu.php';
-include_once 'config/config.php';
+require_once('config/db.php');
+
+$conn = db();
+
 ?>
 
 <head>
@@ -28,9 +31,9 @@ if(isset($_POST["submit"]))
     	}
     		else
     		{}
-    
+
     $checkuser = $conn->query($checkquery);
-    
+
     $row = $checkuser->fetch_array(MYSQLI_NUM);
     $touser = $row[0];
 

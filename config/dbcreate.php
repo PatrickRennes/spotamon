@@ -1,5 +1,4 @@
 <?php
-require('config.php');
 
 // sql to create spoting table
 $spot = "CREATE TABLE IF NOT EXISTS `spots` (
@@ -108,7 +107,6 @@ id INT(10) PRIMARY KEY AUTO_INCREMENT NOT NULL,
 email VARCHAR(100) NOT NULL,
 uname VARCHAR(100) NOT NULL,
 upass VARCHAR(100) NOT NULL,
-discord_id VARCHAR(100),
 usergroup VARCHAR(1) NOT NULL,
 trn_date datetime NOT NULL,
 url TEXT NOT NULL,

@@ -1,6 +1,6 @@
 <?php
 include 'frontend/menu.php';
-include_once 'config/config.php';
+require_once('./config/config.php');
 ?>
 
 <head>
@@ -84,7 +84,7 @@ if(isset($_POST["submit"]))
 		$mail->AddAddress($mailemail, 'Name');		//Adds a "To" address
 		$mail->AddCC($_POST["email"], $_POST["name"]);	//Adds a "Cc" address
 		$mail->WordWrap = 50;							//Sets word wrapping on the body of the message to a given number of characters
-		$mail->IsHTML(true);							//Sets message type to HTML				
+		$mail->IsHTML(true);							//Sets message type to HTML
 		$mail->Subject = $_POST["subject"];				//Sets the Subject of the message
 		$mail->Body = $_POST["message"];				//An HTML or plain text message body
 		if($mail->Send())								//Send an Email. Return true on success or false on error
@@ -135,4 +135,3 @@ if(isset($_SESSION["uname"])){?>
 echo "</div></center>";}?>
 
 <footer></footer>
-

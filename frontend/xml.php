@@ -1,5 +1,6 @@
 <?php
-require('../config/config.php');
+require_once('../config/db.php');
+$conn = db();
 function parseToXML($htmlStr)
 {
 $xmlStr=str_replace('<','&lt;',$htmlStr);
@@ -23,7 +24,7 @@ $ind=0;
 
 // Iterate through the rows, printing XML nodes for each
 while ($row = @mysqli_fetch_assoc($result)){
-	
+
   // Add to XML document node
   echo '<marker ';
   echo 'id="' . $row['pokemon'] . '" ';
@@ -39,7 +40,7 @@ while ($row = @mysqli_fetch_assoc($result)){
   echo 'type="' . $row['pokemon'] . '" ';
   echo 'good="' . $row['good'] . '" ';
   echo 'bad="' . $row['bad'] . '" ';
-  echo 'spotter="' . $row['spotter'] . '" ';  
+  echo 'spotter="' . $row['spotter'] . '" ';
   echo '/>';
   $ind = $ind + 1;
 }
